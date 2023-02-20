@@ -34,18 +34,6 @@ function sumDeposits(rows) {
         totals[key] = totals[key] + value;
         return totals;
     }, {});
-
-    // const summedRows = rows.reduce((acc, next) => {
-    //     const rowEntry = {
-    //         "Options": (acc, next) => ({...acc, optionsDeposits: acc.optionsDeposits + parseInt(next[1])}),
-    //         "ISA": (acc, next) => ({...acc, isaDeposits: acc.isaDeposits + parseInt(next[1])}),
-    //     }[next[0]];
-    //
-    //     return rowEntry ? rowEntry(acc, next) : acc;
-    // }, {"optionsDeposits": 0, "isaDeposits": 0});
-    //
-    // console.log(summedRows);
-    // return summedRows;
 }
 
 main(mainParams);
