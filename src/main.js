@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
 import privKey from '../priv_key.json' assert { type: 'json' };
+import { Log } from "./Log";
 
 const rowMap = {
   "Options": (acc, next) => ({ ...acc, optionsDeposits: acc.optionsDeposits + parseInt(next[1]) }),
@@ -19,10 +20,10 @@ const auth = async () => {
   return new Promise((resolve, reject) => {
     jwtClient.authorize(function (err, tokens) {
       if (err) {
-        console.log(err);
+        Log.error(err);
         reject(err);
       } else {
-        console.log("Success authenticating...")
+        Log.info("Success authenticating...")
         resolve(jwtClient);
       }
     });
@@ -53,7 +54,7 @@ const main = async () => {
     return rowEntry ? rowEntry(acc, next) : acc;
   }, { "optionsDeposits": 0, "isaDeposits": 0 });
 
-  console.log(summedRows);
+  Log.info(summedRows);
 
   const dataToWrite = {
     values: [
