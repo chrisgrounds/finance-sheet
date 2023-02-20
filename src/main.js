@@ -32,23 +32,11 @@ function hasNoData(rows) {
 function sumDeposits(rows) {
   return rows.reduce((totals, row) => {
     let key = row[0];
-    let value = row[1];
-    if (totals[key] === undefined) totals[key] = 0;
-    totals[key] = totals[key] + value;
-    return totals;
-  }, {});
-
-  // const summedRows = rows.reduce((acc, next) => {
-  //     const rowEntry = {
-  //         "Options": (acc, next) => ({...acc, optionsDeposits: acc.optionsDeposits + parseInt(next[1])}),
-  //         "ISA": (acc, next) => ({...acc, isaDeposits: acc.isaDeposits + parseInt(next[1])}),
-  //     }[next[0]];
-  //
-  //     return rowEntry ? rowEntry(acc, next) : acc;
-  // }, {"optionsDeposits": 0, "isaDeposits": 0});
-  //
-  // console.log(summedRows);
-  // return summedRows;
+    let value = isNaN(Number(row[1])) ? 0 : Number(row[1]);
+        if (totals[key] === undefined) totals[key] = 0;
+        totals[key] = totals[key] + value;
+        return totals;
+    }, {});
 }
 
 main(mainParams);
