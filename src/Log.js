@@ -1,6 +1,7 @@
 const Log = {
-  info: (msg) => console.log(`[info]: ${typeof msg == "object" ? JSON.stringify(msg) : msg}`),
-  error: (msg) => console.log(`[error]: ${typeof msg == "object" ? JSON.stringify(msg) : msg}`),
+  info: (msg) => Log.log("info", msg),
+  error: (msg) => Log.log("error", msg),
+  log: (type, msg) => console.log(`[${type}]: ${typeof msg == "object" ? JSON.stringify(msg) : msg}`),
 }
 
 export { Log };
