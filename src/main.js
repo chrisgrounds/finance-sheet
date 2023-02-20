@@ -6,20 +6,16 @@ const mainParams = {
     sheetId: '1VJI0G67jWe4KFeDyqrUpId1pX1-iK0A16maJ7I_pqP4',
     depositRangeInput: 'Deposits Stream!A2:B',
     depositRangeOutput: 'Deposits Stream!G1',
-    depositData: {
-        "Options": "Total Options Deposits",
-        "ISA": "Total ISA Deposits",
-    }
 }
 
-const main = async ({privKey, sheetId, depositRangeInput, depositRangeOutput, depositData}) => {
+const main = async ({privKey, sheetId, depositRangeInput, depositRangeOutput}) => {
     const sheets = await loadSheets(privKey, sheetId);
     const rows = await sheets.loadRows(depositRangeInput);
     if (hasNoData(rows)) return;
 
-    const deposits = sumDeposits(rows, depositData);
+    const deposits = sumDeposits(rows);
 
-    await sheets.writeRows(depositRangeOutput, depositData, deposits);
+    await sheets.writeRows(depositRangeOutput, deposits);
 }
 
 function hasNoData(rows) {
@@ -30,14 +26,12 @@ function hasNoData(rows) {
     return false;
 }
 
-function sumDeposits(rows, depositData) {
+function sumDeposits(rows) {
     return rows.reduce((totals, row) => {
         let key = row[0];
         let value = row[1];
-        if (depositData[key]) {
-            if (totals[key] === undefined) totals[key] = 0;
-            totals[key] = totals[key] + value;
-        }
+        if (totals[key] === undefined) totals[key] = 0;
+        totals[key] = totals[key] + value;
         return totals;
     }, {});
 
