@@ -28,7 +28,7 @@ export async function loadSheets(privKey, sheetId) {
       await sheets
         .spreadsheets
         .values
-        .append({
+        .update({
           spreadsheetId: sheetId,
           range: depositRangeOutput,
           resource: dataToWrite,
@@ -38,7 +38,7 @@ export async function loadSheets(privKey, sheetId) {
             console.log(err);
           } else {
             Log.info(
-              `${result.data.updates.updatedCells} cells updated on range: ${result.data.updates.updatedRange}`
+              `${result.data.updatedCells} cells updated on range: ${result.data.updatedRange}`
             );
           }
         });
