@@ -1,0 +1,16 @@
+{
+  "name": "finance-sheet",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/local-auth": "^2.1.0",
+    "googleapis": "^105.0.0"
+  }
+}
