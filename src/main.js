@@ -1,4 +1,5 @@
-import { google } from 'googleapis';
+import {google} from 'googleapis';
+import {auth} from "./auth.js";
 import privKey from '../priv_key.json' assert { type: 'json' };
 
 const rowMap = {
@@ -6,31 +7,8 @@ const rowMap = {
   "ISA": (acc, next) => ({ ...acc, isaDeposits: acc.isaDeposits + parseInt(next[1]) }),
 };
 
-const auth = async () => {
-  const jwtClient = new google.auth.JWT(
-    privKey.client_email,
-    null,
-    privKey.private_key,
-    [
-      "https://www.googleapis.com/auth/spreadsheets",
-    ]
-  );
-
-  return new Promise((resolve, reject) => {
-    jwtClient.authorize(function (err, tokens) {
-      if (err) {
-        console.log(err);
-        reject(err);
-      } else {
-        console.log("Success authenticating...")
-        resolve(jwtClient);
-      }
-    });
-  });
-}
-
 const main = async () => {
-  const jwtClient = await auth();
+  const jwtClient = await auth(privKey);
 
   const sheets = google.sheets({ version: 'v4', auth: jwtClient });
 
