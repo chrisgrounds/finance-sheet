@@ -15,11 +15,22 @@ export async function loadSheets(privKey, sheetId) {
                 });
             return rows;
         },
-        writeRows: async (depositRangeOutput, optionsDeposits, isaDeposits) => {
+        writeRows: async (depositRangeOutput, depositData, deposits) => {
+            let totalsData = Object
+                .keys(depositData)
+                .map(depositType => ({
+                    header: depositData[depositType],
+                    total: deposits[depositType] || 0
+                }))
+                .map(headerAndTotal => {
+                    let returnObject = {}
+                    returnObject[headerAndTotal.header] = headerAndTotal.total;
+                    return returnObject;
+                });
             const dataToWrite = {
                 values: [
-                    ["Total Options Deposits", "Total ISA Deposits"],
-                    [optionsDeposits, isaDeposits]
+                    Object.keys(totalsData),
+                    Object.values(totalsData),
                 ]
             }
             await sheets
