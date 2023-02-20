@@ -1,92 +1,51 @@
-import { google } from 'googleapis';
-import privKey from '../priv_key.json' assert { type: 'json' };
+import privKey from '../priv_key.json' assert {type: 'json'};
+import {loadSheets} from "./sheets.js";
 
-const rowMap = {
-  "Options": (acc, next) => ({ ...acc, optionsDeposits: acc.optionsDeposits + parseInt(next[1]) }),
-  "ISA": (acc, next) => ({ ...acc, isaDeposits: acc.isaDeposits + parseInt(next[1]) }),
-};
-
-const auth = async () => {
-  const jwtClient = new google.auth.JWT(
-    privKey.client_email,
-    null,
-    privKey.private_key,
-    [
-      "https://www.googleapis.com/auth/spreadsheets",
-    ]
-  );
-
-  return new Promise((resolve, reject) => {
-    jwtClient.authorize(function (err, tokens) {
-      if (err) {
-        console.log(err);
-        reject(err);
-      } else {
-        console.log("Success authenticating...")
-        resolve(jwtClient);
-      }
-    });
-  });
+const mainParams = {
+    privKey: privKey,
+    sheetId: '1VJI0G67jWe4KFeDyqrUpId1pX1-iK0A16maJ7I_pqP4',
+    depositRangeInput: 'Deposits Stream!A2:B',
+    depositRangeOutput: 'Deposits Stream!G1',
 }
 
-const main = async () => {
-  const jwtClient = await auth();
+const main = async ({privKey, sheetId, depositRangeInput, depositRangeOutput}) => {
+    const sheets = await loadSheets(privKey, sheetId);
+    const rows = await sheets.loadRows(depositRangeInput);
+    if (hasNoData(rows)) return;
 
-  const sheets = google.sheets({ version: 'v4', auth: jwtClient });
+    const deposits = sumDeposits(rows);
 
-  const { data: { values: rows } } = await sheets
-    .spreadsheets
-    .values
-    .get({
-      spreadsheetId: '1VJI0G67jWe4KFeDyqrUpId1pX1-iK0A16maJ7I_pqP4',
-      range: 'Deposits Stream!A2:B',
-    });
-
-  if (!rows || rows.length === 0) {
-    console.log('No data found.');
-    return;
-  }
-
-  const summedRows = rows.reduce((acc, next) => {
-    const rowEntry = rowMap[next[0]];
-
-    return rowEntry ? rowEntry(acc, next) : acc;
-  }, { "optionsDeposits": 0, "isaDeposits": 0 });
-
-  console.log(summedRows);
-
-  const dataToWrite = {
-    values: [
-      [
-        "Total Options Deposits",
-        "Total ISA Deposits"
-      ],
-      [
-        summedRows.optionsDeposits,
-        summedRows.isaDeposits
-      ]
-    ]
-  }
-
-  sheets
-    .spreadsheets
-    .values
-    .append({
-      spreadsheetId: '1VJI0G67jWe4KFeDyqrUpId1pX1-iK0A16maJ7I_pqP4',
-      range: 'Deposits Stream!G1',
-      resource: dataToWrite,
-      valueInputOption: "RAW",
-    }, (err, result) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log(
-          '%d cells updated on range: %s',
-          result.data.updates.updatedCells,
-          result.data.updates.updatedRange
-        );
-      }
-    });
+    await sheets.writeRows(depositRangeOutput, deposits);
 }
 
-main();
+function hasNoData(rows) {
+    if (!rows || rows.length === 0) {
+        console.log('No data found.');
+        return true;
+    }
+    return false;
+}
+
+function sumDeposits(rows) {
+    return rows.reduce((totals, row) => {
+        let key = row[0];
+        let value = row[1];
+        if (totals[key] === undefined) totals[key] = 0;
+        totals[key] = totals[key] + value;
+        return totals;
+    }, {});
+
+    // const summedRows = rows.reduce((acc, next) => {
+    //     const rowEntry = {
+    //         "Options": (acc, next) => ({...acc, optionsDeposits: acc.optionsDeposits + parseInt(next[1])}),
+    //         "ISA": (acc, next) => ({...acc, isaDeposits: acc.isaDeposits + parseInt(next[1])}),
+    //     }[next[0]];
+    //
+    //     return rowEntry ? rowEntry(acc, next) : acc;
+    // }, {"optionsDeposits": 0, "isaDeposits": 0});
+    //
+    // console.log(summedRows);
+    // return summedRows;
+}
+
+main(mainParams);
