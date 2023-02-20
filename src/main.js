@@ -29,7 +29,7 @@ function hasNoData(rows) {
 function sumDeposits(rows) {
     return rows.reduce((totals, row) => {
         let key = row[0];
-        let value = row[1];
+        let value = isNaN(Number(row[1])) ? 0 : Number(row[1]);
         if (totals[key] === undefined) totals[key] = 0;
         totals[key] = totals[key] + value;
         return totals;
