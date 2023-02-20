@@ -1,4 +1,5 @@
-import {google} from "googleapis";
+import { google } from "googleapis";
+import { Log } from "./Log.js";
 
 export const auth = async (privKey) => {
     const jwtClient = new google.auth.JWT(
@@ -13,10 +14,10 @@ export const auth = async (privKey) => {
     return new Promise((resolve, reject) => {
         jwtClient.authorize(function (err, tokens) {
             if (err) {
-                console.log(err);
+                Log.error(err);
                 reject(err);
             } else {
-                console.log("Success authenticating...")
+                Log.info("Success authenticating...")
                 resolve(jwtClient);
             }
         });

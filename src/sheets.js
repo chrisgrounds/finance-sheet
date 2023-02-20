@@ -1,12 +1,12 @@
-import {auth} from "./auth.js";
-import {google} from "googleapis";
+import { auth } from "./auth.js";
+import { google } from "googleapis";
 
 export async function loadSheets(privKey, sheetId) {
     const jwtClient = await auth(privKey);
-    const sheets = await google.sheets({version: 'v4', auth: jwtClient});
+    const sheets = await google.sheets({ version: 'v4', auth: jwtClient });
     return {
         loadRows: async (depositRangeInput) => {
-            const {data: {values: rows}} = await sheets
+            const { data: { values: rows } } = await sheets
                 .spreadsheets
                 .values
                 .get({

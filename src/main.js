@@ -1,5 +1,6 @@
 import privKey from '../priv_key.json' assert {type: 'json'};
 import { loadSheets } from "./sheets.js";
+import { Log } from "./Log.js";
 
 const mainParams = {
   privKey: privKey,
@@ -14,6 +15,8 @@ const main = async ({ privKey, sheetId, depositRangeInput, depositRangeOutput })
   if (hasNoData(rows)) return;
 
   const deposits = sumDeposits(rows);
+
+  Log.info(deposits);
 
   await sheets.writeRows(depositRangeOutput, deposits);
 }
