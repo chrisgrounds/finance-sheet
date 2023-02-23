@@ -2,31 +2,17 @@ extern crate google_sheets4 as sheets4;
 use sheets4::{hyper, hyper_rustls, oauth2, Sheets};
 use std::collections::HashMap;
 
+mod auth;
 mod config;
+mod http_client;
 
 #[tokio::main]
 async fn main() {
     let config = config::Config::new();
+    let client = http_client::http_client();
+    let auth = auth::auth(&config, client.clone()).await;
 
-    let secret: oauth2::ServiceAccountKey = oauth2::read_service_account_key(config.priv_key)
-        .await
-        .expect("secret no");
-
-    let client = hyper::Client::builder().build(
-        hyper_rustls::HttpsConnectorBuilder::new()
-            .with_native_roots()
-            .https_only()
-            .enable_http1()
-            .enable_http2()
-            .build(),
-    );
-
-    let auth = oauth2::ServiceAccountAuthenticator::with_client(secret, client.clone())
-        .build()
-        .await
-        .expect("could not create an authenticator");
-
-    let mut hub = Sheets::new(client, auth);
+    let mut hub = Sheets::new(client.clone(), auth);
 
     let result = hub
         .spreadsheets()
