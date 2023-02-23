@@ -2,9 +2,13 @@ extern crate google_sheets4 as sheets4;
 use sheets4::{hyper, hyper_rustls, oauth2, Sheets};
 use std::collections::HashMap;
 
+mod config;
+
 #[tokio::main]
 async fn main() {
-    let secret: oauth2::ServiceAccountKey = oauth2::read_service_account_key("priv_key.json")
+    let config = config::Config::new();
+
+    let secret: oauth2::ServiceAccountKey = oauth2::read_service_account_key(config.priv_key)
         .await
         .expect("secret no");
 
@@ -26,10 +30,7 @@ async fn main() {
 
     let result = hub
         .spreadsheets()
-        .values_get(
-            "1VJI0G67jWe4KFeDyqrUpId1pX1-iK0A16maJ7I_pqP4",
-            "Deposits Stream!A2:B",
-        )
+        .values_get(&config.sheet_id, &config.deposit_range_input)
         .doit()
         .await;
 
