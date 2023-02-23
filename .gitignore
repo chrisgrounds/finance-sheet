@@ -2,4 +2,6 @@ credentials.json
 token.json
 node_modules
 package-lock.json
-priv_key.json
+**/*priv_key.json
+**/target
+*lock
