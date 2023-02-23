@@ -1,5 +1,5 @@
 extern crate google_sheets4 as sheets4;
-use sheets4::{hyper, hyper_rustls, oauth2, Sheets};
+use sheets4::Sheets;
 use std::collections::HashMap;
 
 mod auth;
